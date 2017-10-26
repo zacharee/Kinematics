@@ -12,11 +12,13 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.OvershootInterpolator
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import jp.wasabeef.recyclerview.animators.FadeInAnimator
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -53,6 +55,7 @@ class HistoryActivity : AppCompatActivity() {
         val decorator = DividerItemDecoration(this, llm.orientation)
 
         recView.addItemDecoration(decorator)
+        recView.itemAnimator = FadeInAnimator(OvershootInterpolator())
     }
 
     class CustomAdapter constructor(historyList: ArrayList<HistoryType>, context: Context) : RecyclerView.Adapter<CustomAdapter.CustomHolder>() {
@@ -82,7 +85,7 @@ class HistoryActivity : AppCompatActivity() {
                         .setPositiveButton("Yes", { dialog, which ->
                             historyList.removeAt(position)
                             saveNewHistory(historyList)
-                            notifyDataSetChanged()
+                            notifyItemRemoved(position)
                         })
                         .setNegativeButton("No", null)
                         .show()
@@ -97,8 +100,8 @@ class HistoryActivity : AppCompatActivity() {
         fun saveNewHistory(list: ArrayList<HistoryType>) {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-            val gson = Gson()
-            var json = gson.toJson(list)
+            val gson = GsonBuilder()
+            var json = gson.serializeSpecialFloatingPointValues().create().toJson(list)
 
             sharedPreferences.edit().putString("history_json", json).apply()
         }
