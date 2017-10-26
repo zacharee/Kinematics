@@ -1,20 +1,19 @@
 package com.zacharee1.kinematics
 
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.ColorFilter
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.TextInputEditText
+import android.support.v7.app.AlertDialog
+import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.view.*
+import android.view.inputmethod.InputMethodManager
+import android.widget.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -42,8 +41,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var aInput: TextInputEditText
     private lateinit var tInput: TextInputEditText
 
-    private lateinit var calc: Button
-
     private lateinit var sharedPreferences: SharedPreferences
 
     private val VF = "VF"
@@ -58,21 +55,44 @@ class MainActivity : AppCompatActivity() {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
+        setUpActionBar()
         setElements()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu, menu)
-        return true
-    }
+    fun setUpActionBar() {
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == R.id.action_history) {
+        val history = LayoutInflater.from(this).inflate(R.layout.history_button, toolbar, false) as ImageView
+        val calc = LayoutInflater.from(this).inflate(R.layout.calculate_button, toolbar, false) as ImageView
+        val reset = LayoutInflater.from(this).inflate(R.layout.reset_button, toolbar, false) as ImageView
+
+        history.setOnClickListener {
             startActivity(Intent(this, HistoryActivity::class.java))
-            return true
+        }
+        calc.setOnClickListener {
+            onCalc(null)
+        }
+        reset.setOnClickListener {
+            onReset(null)
         }
 
-        return super.onOptionsItemSelected(item)
+        history.setOnLongClickListener {
+            Toast.makeText(this, "History", Toast.LENGTH_SHORT).show()
+            true
+        }
+        calc.setOnLongClickListener {
+            Toast.makeText(this, "Calculate", Toast.LENGTH_SHORT).show()
+            true
+        }
+        reset.setOnLongClickListener {
+            Toast.makeText(this, "Reset", Toast.LENGTH_SHORT).show()
+            true
+        }
+
+        toolbar.addView(history)
+        toolbar.addView(calc)
+        toolbar.addView(reset)
     }
 
     fun setElements() {
@@ -81,8 +101,6 @@ class MainActivity : AppCompatActivity() {
         dXInput = findViewById(R.id.deltax_text)
         aInput = findViewById(R.id.acc_text)
         tInput = findViewById(R.id.time_text)
-
-        calc = findViewById(R.id.calculate)
     }
 
     fun onReset(v: View?) {
@@ -91,9 +109,18 @@ class MainActivity : AppCompatActivity() {
         dXInput.text = null
         aInput.text = null
         tInput.text = null
+
+        val manager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        manager.hideSoftInputFromWindow(window.currentFocus.windowToken, 0)
+
+        vFInput.clearFocus()
+        vIInput.clearFocus()
+        dXInput.clearFocus()
+        aInput.clearFocus()
+        tInput.clearFocus()
     }
 
-    fun onCalc(v: View) {
+    fun onCalc(v: View?) {
         setVF()
         setVI()
         setDX()
@@ -174,6 +201,8 @@ class MainActivity : AppCompatActivity() {
 
         if (historyList == null) historyList = ArrayList()
 
+        findViewById<LinearLayout>(R.id.history_layout).visibility = View.VISIBLE
+
         if (historyList.size > 0) {
             val history = historyList[0]
 
@@ -190,6 +219,52 @@ class MainActivity : AppCompatActivity() {
             vi.text = String.format("VI (m/s) = %.4f", history.vI)
             vf.text = String.format("VF (m/s) = %.4f", history.vF)
             dx.text = String.format("Δx (m) = %.4f", history.dX)
+
+            val manager: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+            findViewById<LinearLayout>(R.id.history_layout).setOnClickListener {
+                val alertDialog = AlertDialog.Builder(this)
+                        .setTitle((findViewById<TextView>(R.id.date_text)).text.toString())
+                        .setView(R.layout.layout_full_history)
+                        .setPositiveButton("OK", null)
+                        .show()
+
+                val time: TextView? = alertDialog.findViewById(R.id.time_measure)
+                val acc: TextView? = alertDialog.findViewById(R.id.acc_measure)
+                val vi: TextView? = alertDialog.findViewById(R.id.vi_measure)
+                val vf: TextView? = alertDialog.findViewById(R.id.vf_measure)
+                val dx: TextView? = alertDialog.findViewById(R.id.dx_measure)
+
+                time?.text = history.t.toString()
+                acc?.text = history.a.toString()
+                vi?.text = history.vI.toString()
+                vf?.text = history.vF.toString()
+                dx?.text = history.dX.toString()
+
+                val clickListen: View.OnClickListener = View.OnClickListener {view: View ->
+                    var name = "unknown"
+
+                    when (view) {
+                        time -> name = "time"
+                        acc -> name = "acceleration"
+                        vi -> name = "vinitial"
+                        vf -> name = "vfinal"
+                        dx -> name = "delta"
+                    }
+
+                    val valueToSave = (view as TextView).text.toString()
+                    val clip: ClipData = ClipData.newPlainText(name, valueToSave)
+                    manager.primaryClip = clip
+
+                    Toast.makeText(this, "$name copied to clipboard", Toast.LENGTH_SHORT).show()
+                }
+
+                time?.setOnClickListener(clickListen)
+                acc?.setOnClickListener(clickListen)
+                vi?.setOnClickListener(clickListen)
+                vf?.setOnClickListener(clickListen)
+                dx?.setOnClickListener(clickListen)
+            }
         }
     }
 

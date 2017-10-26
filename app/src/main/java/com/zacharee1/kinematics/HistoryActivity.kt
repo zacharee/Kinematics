@@ -1,5 +1,7 @@
 package com.zacharee1.kinematics
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
@@ -15,6 +17,7 @@ import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -82,7 +85,7 @@ class HistoryActivity : AppCompatActivity() {
                 AlertDialog.Builder(holder.itemView.context)
                         .setTitle("Delete?")
                         .setMessage("Remove From History?")
-                        .setPositiveButton("Yes", { dialog, which ->
+                        .setPositiveButton("Yes", { _, _ ->
                             historyList.removeAt(position)
                             saveNewHistory(historyList)
                             notifyItemRemoved(position)
@@ -91,6 +94,8 @@ class HistoryActivity : AppCompatActivity() {
                         .show()
                 true
             }
+
+            val manager: ClipboardManager = holder.itemView.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
             holder.layout.setOnClickListener {
                 val alertDialog = AlertDialog.Builder(holder.itemView.context)
@@ -110,6 +115,30 @@ class HistoryActivity : AppCompatActivity() {
                 vi?.text = history.vI.toString()
                 vf?.text = history.vF.toString()
                 dx?.text = history.dX.toString()
+
+                val clickListen: View.OnClickListener = View.OnClickListener {view: View ->
+                    var name = "unknown"
+
+                    when (view) {
+                        time -> name = "time"
+                        acc -> name = "acceleration"
+                        vi -> name = "vinitial"
+                        vf -> name = "vfinal"
+                        dx -> name = "delta"
+                    }
+
+                    val valueToSave = (view as TextView).text.toString()
+                    val clip: ClipData = ClipData.newPlainText(name, valueToSave)
+                    manager.primaryClip = clip
+
+                    Toast.makeText(holder.itemView.context, "$name copied to clipboard", Toast.LENGTH_SHORT).show()
+                }
+
+                time?.setOnClickListener(clickListen)
+                acc?.setOnClickListener(clickListen)
+                vi?.setOnClickListener(clickListen)
+                vf?.setOnClickListener(clickListen)
+                dx?.setOnClickListener(clickListen)
             }
         }
 

@@ -2,9 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="16dp"
-    android:layout_marginTop="16dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingTop="16dp">
 
     <TableLayout
         android:layout_width="match_parent"
@@ -20,25 +19,36 @@
             <TextView
                 android:id="@+id/time_title"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="end"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
                 android:text="Time ="
-                android:textAlignment="textEnd" />
+                android:textAlignment="textEnd"
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/time_measure"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="@dimen/detail_margin_side"
+                android:layout_marginStart="@dimen/detail_margin_side"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center_vertical"
                 android:textAlignment="center"
-                android:textIsSelectable="true" />
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/time_unit"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
                 android:text="s"
-                android:textAlignment="textStart" />
+                android:textAlignment="textStart"
+                android:textSize="18sp" />
         </TableRow>
 
         <TableRow
@@ -50,25 +60,36 @@
             <TextView
                 android:id="@+id/acc_title"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="end"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
                 android:text="Acc ="
-                android:textAlignment="textEnd" />
+                android:textAlignment="textEnd"
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/acc_measure"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="@dimen/detail_margin_side"
+                android:layout_marginStart="@dimen/detail_margin_side"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center_vertical"
                 android:textAlignment="center"
-                android:textIsSelectable="true" />
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/acc_unit"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
                 android:text="m/s²"
-                android:textAlignment="textStart" />
+                android:textAlignment="textStart"
+                android:textSize="18sp" />
 
         </TableRow>
 
@@ -81,25 +102,36 @@
             <TextView
                 android:id="@+id/vi_title"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="end"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
                 android:text="VIinital ="
-                android:textAlignment="textEnd" />
+                android:textAlignment="textEnd"
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/vi_measure"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="@dimen/detail_margin_side"
+                android:layout_marginStart="@dimen/detail_margin_side"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center_vertical"
                 android:textAlignment="center"
-                android:textIsSelectable="true" />
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/vi_unit"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
                 android:text="m/s"
-                android:textAlignment="textStart" />
+                android:textAlignment="textStart"
+                android:textSize="18sp" />
 
         </TableRow>
 
@@ -112,25 +144,36 @@
             <TextView
                 android:id="@+id/vf_title"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="end"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
                 android:text="VFinal ="
-                android:textAlignment="textEnd" />
+                android:textAlignment="textEnd"
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/vf_measure"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="@dimen/detail_margin_side"
+                android:layout_marginStart="@dimen/detail_margin_side"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center_vertical"
                 android:textAlignment="center"
-                android:textIsSelectable="true" />
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/vf_unit"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
                 android:text="m/s"
-                android:textAlignment="textStart" />
+                android:textAlignment="textStart"
+                android:textSize="18sp" />
 
         </TableRow>
 
@@ -142,25 +185,36 @@
             <TextView
                 android:id="@+id/dx_title"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="end"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
                 android:text="Δx ="
-                android:textAlignment="textEnd" />
+                android:textAlignment="textEnd"
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/dx_measure"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="@dimen/detail_margin_side"
+                android:layout_marginStart="@dimen/detail_margin_side"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center_vertical"
                 android:textAlignment="center"
-                android:textIsSelectable="true" />
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/dx_unit"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
                 android:text="m"
-                android:textAlignment="textStart" />
+                android:textAlignment="textStart"
+                android:textSize="18sp" />
 
         </TableRow>
     </TableLayout>
