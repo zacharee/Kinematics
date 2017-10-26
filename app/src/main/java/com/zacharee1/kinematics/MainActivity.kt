@@ -18,6 +18,7 @@ import android.widget.Toast
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import kotlinx.android.synthetic.main.activity_main.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -105,25 +106,40 @@ class MainActivity : AppCompatActivity() {
     fun checkNull() {
         val nulls: ArrayList<String> = ArrayList()
 
-        if (vF == Double.NEGATIVE_INFINITY) nulls.add(VF)
-        if (vI == Double.NEGATIVE_INFINITY) nulls.add(VI)
-        if (dX == Double.NEGATIVE_INFINITY) nulls.add(DX)
-        if (a == Double.NEGATIVE_INFINITY) nulls.add(A)
-        if (t == Double.NEGATIVE_INFINITY) nulls.add(T)
+        if (isNull(vF)) nulls.add(VF)
+        if (isNull(vI)) nulls.add(VI)
+        if (isNull(dX)) nulls.add(DX)
+        if (isNull(a)) nulls.add(A)
+        if (isNull(t)) nulls.add(T)
 
         if (nulls.size > 2) Toast.makeText(this, "Need at least three knowns", Toast.LENGTH_LONG).show()
         else doCalc(nulls)
     }
 
     fun doCalc(nulls: ArrayList<String>) {
-        if (nulls.contains(VI)) solveForVI()
+        if (nulls.contains(VI)) {
+            solveForVI()
+            nulls.remove(VI)
+        }
 
-        for (s in nulls) {
-            if (s == VI) solveForVI()
-            if (s == VF) solveForVF()
-            if (s == DX) solveForDX()
-            if (s == A) solveForA()
-            if (s == T) solveForT()
+        if (nulls.contains(VF)) {
+            solveForVF()
+            nulls.remove(VF)
+        }
+
+        if (nulls.contains(DX)) {
+            solveForDX()
+            nulls.remove(DX)
+        }
+
+        if (nulls.contains(A)) {
+            solveForA()
+            nulls.remove(A)
+        }
+
+        if (nulls.contains(T)) {
+            solveForT()
+            nulls.remove(T)
         }
 
         saveHistory()
@@ -178,7 +194,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun isNull(num: Double): Boolean {
-        return num == Double.NEGATIVE_INFINITY || num == Double.NaN
+        return num == Double.NEGATIVE_INFINITY
     }
 
     fun solveForVF() {
@@ -193,7 +209,7 @@ class MainActivity : AppCompatActivity() {
         if (!isNull(a)
                 && !isNull(t)) {
             Log.e("VF", "1")
-            value = a * t * vI
+            value = a * t + vI
         }
         else if (!isNull(dX)
                      && !isNull(t)) {
@@ -208,7 +224,7 @@ class MainActivity : AppCompatActivity() {
             if (dX < 0) value = -value
         }
 
-        logAll()
+        logAll("VF")
         vF = value
         vFInput.setText(value.toString())
     }
@@ -241,12 +257,12 @@ class MainActivity : AppCompatActivity() {
         }
         else if (!isNull(vF)
                      && !isNull(a)
-                     &&!isNull(dX)) {
+                     && !isNull(dX)) {
             Log.e("VI", "4")
             value = Math.sqrt(vF * vF - 2 * a * dX)
         }
 
-        logAll()
+        logAll("VI")
         vI = value
         vIInput.setText(value.toString())
     }
@@ -271,12 +287,12 @@ class MainActivity : AppCompatActivity() {
             value = 0.5 * (vI + vF) * t
         }
         else if (!isNull(vF)
-                     && !isNull(a)) {
+                     && !isNull(a) && a != 0.0) {
             Log.e("DX", "3")
             value = (vF * vF - vI * vI) / 2 * a
         }
 
-        logAll()
+        logAll("DX")
         dX = value
         dXInput.setText(value.toString())
     }
@@ -306,7 +322,7 @@ class MainActivity : AppCompatActivity() {
             value = (vF * vF - vI * vI) / 2 * dX
         }
 
-        logAll()
+        logAll("A")
         a = value
         aInput.setText(value.toString())
     }
@@ -325,7 +341,7 @@ class MainActivity : AppCompatActivity() {
         var value: Double = Double.NEGATIVE_INFINITY
 
         if (!isNull(vF)
-                && !isNull(a)) {
+                && !isNull(a) && a != 0.0) {
             Log.e("T", "1")
             value = (vF - vI) / a
         }
@@ -345,7 +361,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        logAll()
+        logAll("T")
         t = value
         tInput.setText(value.toString())
     }
@@ -400,7 +416,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun logAll() {
+    fun logAll(source: String) {
+        Log.e("Source", source)
         Log.e("VFVal", vF.toString())
         Log.e("VIVal", vI.toString())
         Log.e("DXVal", dX.toString())
