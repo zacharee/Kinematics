@@ -79,9 +79,6 @@ class HistoryActivity : AppCompatActivity() {
             holder.dx.text = "Δx (m) = " + history.dX.toString()
 
             holder.layout.setOnLongClickListener {
-                val vibrator = holder.itemView.context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                vibrator.vibrate(50)
-
                 AlertDialog.Builder(holder.itemView.context)
                         .setTitle("Delete?")
                         .setMessage("Remove From History?")
