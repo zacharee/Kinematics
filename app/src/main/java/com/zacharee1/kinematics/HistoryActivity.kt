@@ -91,6 +91,26 @@ class HistoryActivity : AppCompatActivity() {
                         .show()
                 true
             }
+
+            holder.layout.setOnClickListener {
+                val alertDialog = AlertDialog.Builder(holder.itemView.context)
+                        .setTitle(holder.date.text)
+                        .setView(R.layout.layout_full_history)
+                        .setPositiveButton("OK", null)
+                        .show()
+
+                val time: TextView? = alertDialog.findViewById(R.id.time_measure)
+                val acc: TextView? = alertDialog.findViewById(R.id.acc_measure)
+                val vi: TextView? = alertDialog.findViewById(R.id.vi_measure)
+                val vf: TextView? = alertDialog.findViewById(R.id.vf_measure)
+                val dx: TextView? = alertDialog.findViewById(R.id.dx_measure)
+
+                time?.text = history.t.toString()
+                acc?.text = history.a.toString()
+                vi?.text = history.vI.toString()
+                vf?.text = history.vF.toString()
+                dx?.text = history.dX.toString()
+            }
         }
 
         override fun getItemCount(): Int {

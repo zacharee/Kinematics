@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="16dp"
+    android:layout_marginTop="16dp"
+    android:orientation="vertical">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:stretchColumns="0,1,2">
+
+        <TableRow
+            android:id="@+id/time_row"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="5dp">
+
+            <TextView
+                android:id="@+id/time_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="Time ="
+                android:textAlignment="textEnd" />
+
+            <TextView
+                android:id="@+id/time_measure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textIsSelectable="true" />
+
+            <TextView
+                android:id="@+id/time_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="s"
+                android:textAlignment="textStart" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/acc_row"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="5dp">
+
+            <TextView
+                android:id="@+id/acc_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="Acc ="
+                android:textAlignment="textEnd" />
+
+            <TextView
+                android:id="@+id/acc_measure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textIsSelectable="true" />
+
+            <TextView
+                android:id="@+id/acc_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="m/s²"
+                android:textAlignment="textStart" />
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/vi_row"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="5dp">
+
+            <TextView
+                android:id="@+id/vi_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="VIinital ="
+                android:textAlignment="textEnd" />
+
+            <TextView
+                android:id="@+id/vi_measure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textIsSelectable="true" />
+
+            <TextView
+                android:id="@+id/vi_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="m/s"
+                android:textAlignment="textStart" />
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/vf_row"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="5dp">
+
+            <TextView
+                android:id="@+id/vf_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="VFinal ="
+                android:textAlignment="textEnd" />
+
+            <TextView
+                android:id="@+id/vf_measure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textIsSelectable="true" />
+
+            <TextView
+                android:id="@+id/vf_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="m/s"
+                android:textAlignment="textStart" />
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/dx_row"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/dx_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="Δx ="
+                android:textAlignment="textEnd" />
+
+            <TextView
+                android:id="@+id/dx_measure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textIsSelectable="true" />
+
+            <TextView
+                android:id="@+id/dx_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="m"
+                android:textAlignment="textStart" />
+
+        </TableRow>
+    </TableLayout>
+</LinearLayout>
