@@ -70,7 +70,7 @@ class HistoryActivity : AppCompatActivity() {
 
             holder.date.text = SimpleDateFormat("E MM/dd/yy hh:mm:ss a", Locale.getDefault()).format(history.time)
             holder.time.text = String.format("T (s) = %.4f", history.t)
-            holder.acc.text = String.format("T (s) = %.4f", history.a)
+            holder.acc.text = String.format("A (m/s²) = %.4f", history.a)
             holder.vi.text = String.format("VI (m/s) = %.4f", history.vI)
             holder.vf.text = String.format("VF (m/s) = %.4f", history.vF)
             holder.dx.text = String.format("Δx (m) = %.4f", history.dX)
