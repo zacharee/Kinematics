@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity() {
 
         val historyItem = HistoryType(vF, vI, dX, a, t, System.currentTimeMillis())
 
-        historyList.add(historyItem)
+        historyList.add(0, historyItem)
 
         json = gson.toJson(historyList)
 
