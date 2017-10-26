@@ -26,14 +26,14 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/time"
+                android:id="@+id/time_history"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/acc"
+                android:id="@+id/acc_history"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
@@ -45,14 +45,14 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/vinitial"
+                android:id="@+id/vinitial_history"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/vfinal"
+                android:id="@+id/vfinal_history"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
@@ -66,7 +66,7 @@
             android:gravity="center_horizontal">
 
             <TextView
-                android:id="@+id/dx"
+                android:id="@+id/dx_history"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"

@@ -12,9 +12,14 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * vFinal = a * t + vInitial
@@ -79,7 +84,7 @@ class MainActivity : AppCompatActivity() {
         calc = findViewById(R.id.calculate)
     }
 
-    fun onReset(v: View) {
+    fun onReset(v: View?) {
         vFInput.text = null
         vIInput.text = null
         dXInput.text = null
@@ -123,14 +128,15 @@ class MainActivity : AppCompatActivity() {
 
         saveHistory()
         printHistory(null)
+        onReset(null)
     }
 
     fun saveHistory() {
-        val gson = Gson()
+        val gBuilder = GsonBuilder()
         var json = sharedPreferences.getString("history_json", null)
         val type = object: TypeToken<ArrayList<HistoryType>>(){}.type
 
-        var historyList: ArrayList<HistoryType>? = gson.fromJson(json, type)
+        var historyList: ArrayList<HistoryType>? = gBuilder.serializeSpecialFloatingPointValues().create().fromJson(json, type)
 
         if (historyList == null) historyList = ArrayList()
 
@@ -138,22 +144,36 @@ class MainActivity : AppCompatActivity() {
 
         historyList.add(0, historyItem)
 
-        json = gson.toJson(historyList)
+        json = gBuilder.serializeSpecialFloatingPointValues().create().toJson(historyList)
 
         sharedPreferences.edit().putString("history_json", json).apply()
     }
 
     fun printHistory(v: View?) {
-        val gson = Gson()
+        val gson = GsonBuilder()
         val json = sharedPreferences.getString("history_json", null)
         val type = object: TypeToken<ArrayList<HistoryType>>(){}.type
 
-        var historyList: ArrayList<HistoryType>? = gson.fromJson(json, type)
+        var historyList: ArrayList<HistoryType>? = gson.serializeSpecialFloatingPointValues().create().fromJson(json, type)
 
         if (historyList == null) historyList = ArrayList()
 
-        for (history in historyList) {
-            Log.e("History", history.toString())
+        if (historyList.size > 0) {
+            val history = historyList[0]
+
+            val date: TextView = findViewById(R.id.date_text)
+            val time: TextView = findViewById(R.id.time_history)
+            val acc: TextView = findViewById(R.id.acc_history)
+            val vi: TextView = findViewById(R.id.vinitial_history)
+            val vf: TextView = findViewById(R.id.vfinal_history)
+            val dx: TextView = findViewById(R.id.dx_history)
+
+            date.text = SimpleDateFormat("E MM/dd/yy hh:mm:ss a", Locale.getDefault()).format(history.time)
+            time.text = String.format("T (s) = %.4f", history.t)
+            acc.text = String.format("T (s) = %.4f", history.a)
+            vi.text = String.format("VI (m/s) = %.4f", history.vI)
+            vf.text = String.format("VF (m/s) = %.4f", history.vF)
+            dx.text = String.format("Δx (m) = %.4f", history.dX)
         }
     }
 

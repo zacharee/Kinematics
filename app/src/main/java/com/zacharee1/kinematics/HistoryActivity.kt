@@ -1,12 +1,9 @@
 package com.zacharee1.kinematics
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.os.VibrationEffect
-import android.os.Vibrator
 import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
@@ -18,8 +15,8 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -41,11 +38,11 @@ class HistoryActivity : AppCompatActivity() {
 
         recView.layoutManager = llm
 
-        val gson = Gson()
+        val gson = GsonBuilder()
         val json = sharedPreferences.getString("history_json", null)
         val type = object: TypeToken<ArrayList<HistoryType>>(){}.type
 
-        var historyList: ArrayList<HistoryType>? = gson.fromJson(json, type)
+        var historyList: ArrayList<HistoryType>? = gson.serializeSpecialFloatingPointValues().create().fromJson(json, type)
 
         if (historyList == null) historyList = ArrayList()
 
@@ -72,11 +69,11 @@ class HistoryActivity : AppCompatActivity() {
             val history = historyList[position]
 
             holder.date.text = SimpleDateFormat("E MM/dd/yy hh:mm:ss a", Locale.getDefault()).format(history.time)
-            holder.time.text = "T (s) = " +  history.t.toString()
-            holder.acc.text = "A (m/s²) = " + history.a.toString()
-            holder.vi.text = "VI (m/s) = " + history.vI.toString()
-            holder.vf.text = "VF (m/s) = " + history.vF.toString()
-            holder.dx.text = "Δx (m) = " + history.dX.toString()
+            holder.time.text = String.format("T (s) = %.4f", history.t)
+            holder.acc.text = String.format("T (s) = %.4f", history.a)
+            holder.vi.text = String.format("VI (m/s) = %.4f", history.vI)
+            holder.vf.text = String.format("VF (m/s) = %.4f", history.vF)
+            holder.dx.text = String.format("Δx (m) = %.4f", history.dX)
 
             holder.layout.setOnLongClickListener {
                 AlertDialog.Builder(holder.itemView.context)
@@ -118,11 +115,11 @@ class HistoryActivity : AppCompatActivity() {
 
             init {
                 date = v.findViewById(R.id.date_text)
-                time = v.findViewById(R.id.time)
-                acc = v.findViewById(R.id.acc)
-                vi = v.findViewById(R.id.vinitial)
-                vf = v.findViewById(R.id.vfinal)
-                dx = v.findViewById(R.id.dx)
+                time = v.findViewById(R.id.time_history)
+                acc = v.findViewById(R.id.acc_history)
+                vi = v.findViewById(R.id.vinitial_history)
+                vf = v.findViewById(R.id.vfinal_history)
+                dx = v.findViewById(R.id.dx_history)
 
                 layout = v.findViewById(R.id.history_layout)
             }
