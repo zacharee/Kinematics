@@ -1,20 +1,20 @@
 package com.zacharee1.kinematics
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.TextInputEditText
-import android.text.Editable
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.activity_main.*
-import java.lang.reflect.Type
-import kotlin.coroutines.experimental.buildIterator
 
 /**
  * vFinal = a * t + vInitial
@@ -53,6 +53,20 @@ class MainActivity : AppCompatActivity() {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         setElements()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item?.itemId == R.id.action_history) {
+            startActivity(Intent(this, HistoryActivity::class.java))
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     fun setElements() {
