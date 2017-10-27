@@ -14,6 +14,8 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.view.animation.OvershootInterpolator
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -21,6 +23,8 @@ import android.widget.Toast
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import jp.wasabeef.recyclerview.adapters.SlideInBottomAnimationAdapter
+import jp.wasabeef.recyclerview.adapters.SlideInLeftAnimationAdapter
 import jp.wasabeef.recyclerview.animators.FadeInAnimator
 import java.text.SimpleDateFormat
 import java.util.*
@@ -65,9 +69,10 @@ class HistoryActivity : AppCompatActivity() {
         private val historyList = historyList
         private val context = context
 
+        private var lastPosition = -1
+
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): CustomHolder {
             val view: View = LayoutInflater.from(parent?.context).inflate(R.layout.history_layout, parent, false)
-
             return CustomHolder(view)
         }
 
@@ -139,6 +144,16 @@ class HistoryActivity : AppCompatActivity() {
                 vi?.setOnClickListener(clickListen)
                 vf?.setOnClickListener(clickListen)
                 dx?.setOnClickListener(clickListen)
+            }
+
+            setAnimation(holder.itemView, position)
+        }
+
+        fun setAnimation(animateView: View, position: Int) {
+            if (position > lastPosition) {
+                val animation: Animation = AnimationUtils.loadAnimation(animateView.context, android.R.anim.slide_in_left)
+                animateView.startAnimation(animation)
+                lastPosition = position
             }
         }
 
