@@ -1,9 +1,6 @@
 package com.zacharee1.kinematics
 
 import android.content.*
-import android.content.res.ColorStateList
-import android.graphics.Color
-import android.graphics.ColorFilter
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -14,10 +11,8 @@ import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.activity_main.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -29,11 +24,15 @@ import java.util.*
  */
 
 class MainActivity : AppCompatActivity() {
-    private var vF: Double = Double.NEGATIVE_INFINITY
-    private var vI: Double = Double.NEGATIVE_INFINITY
-    private var dX: Double = Double.NEGATIVE_INFINITY
-    private var a: Double = Double.NEGATIVE_INFINITY
-    private var t: Double = Double.NEGATIVE_INFINITY
+    companion object {
+        private const val VF_TEXT = "VF"
+        private const val VI_TEXT = "VI"
+        private const val DX_TEXT = "DX"
+        private const val A_TEXT = "A"
+        private const val T_TEXT = "T"
+    }
+
+    private val item = KinematicsItem(0.0, 0.0, 0.0, 0.0, 0.0)
 
     private lateinit var vFInput: TextInputEditText
     private lateinit var vIInput: TextInputEditText
@@ -42,12 +41,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tInput: TextInputEditText
 
     private lateinit var sharedPreferences: SharedPreferences
-
-    private val VF = "VF"
-    private val VI = "VI"
-    private val DX = "DX"
-    private val A = "A"
-    private val T = "T"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +52,107 @@ class MainActivity : AppCompatActivity() {
         setElements()
     }
 
-    fun setUpActionBar() {
+    fun onCalc(v: View?) {
+        setVF()
+        setVI()
+        setDX()
+        setA()
+        setT()
+
+        checkNull()
+    }
+
+    fun onReset(v: View?) {
+        vFInput.text = null
+        vIInput.text = null
+        dXInput.text = null
+        aInput.text = null
+        tInput.text = null
+
+        val manager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        manager.hideSoftInputFromWindow(window.currentFocus.windowToken, 0)
+
+        vFInput.clearFocus()
+        vIInput.clearFocus()
+        dXInput.clearFocus()
+        aInput.clearFocus()
+        tInput.clearFocus()
+    }
+
+    fun printHistory(v: View?) {
+        val gson = GsonBuilder()
+        val json = sharedPreferences.getString("history_json", null)
+        val type = object: TypeToken<ArrayList<HistoryItem>>(){}.type
+
+        var historyList: ArrayList<HistoryItem>? = gson.serializeSpecialFloatingPointValues().create().fromJson(json, type)
+
+        if (historyList == null) historyList = ArrayList()
+
+        findViewById<LinearLayout>(R.id.history_layout).visibility = View.VISIBLE
+
+        if (historyList.size > 0) {
+            val history = historyList[0]
+
+            val date: TextView = findViewById(R.id.date_text)
+            val time: TextView = findViewById(R.id.time_history)
+            val acc: TextView = findViewById(R.id.acc_history)
+            val vi: TextView = findViewById(R.id.vinitial_history)
+            val vf: TextView = findViewById(R.id.vfinal_history)
+            val dx: TextView = findViewById(R.id.dx_history)
+
+            date.text = SimpleDateFormat("E MM/dd/yy hh:mm:ss a", Locale.getDefault()).format(history.time)
+            time.text = String.format("T (s) = %.4f", history.t)
+            acc.text = String.format("A (m/s²) = %.4f", history.a)
+            vi.text = String.format("VI (m/s) = %.4f", history.vI)
+            vf.text = String.format("VF (m/s) = %.4f", history.vF)
+            dx.text = String.format("Δx (m) = %.4f", history.dX)
+
+            val manager: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+            findViewById<LinearLayout>(R.id.history_layout).setOnClickListener {
+                val alertDialog = AlertDialog.Builder(this)
+                        .setTitle((findViewById<TextView>(R.id.date_text)).text.toString())
+                        .setView(R.layout.layout_full_history)
+                        .setPositiveButton("OK", null)
+                        .show()
+
+                val timeMeas: TextView? = alertDialog.findViewById(R.id.time_measure)
+                val accMeas: TextView? = alertDialog.findViewById(R.id.acc_measure)
+                val viMeas: TextView? = alertDialog.findViewById(R.id.vi_measure)
+                val vfMeas: TextView? = alertDialog.findViewById(R.id.vf_measure)
+                val dxMeas: TextView? = alertDialog.findViewById(R.id.dx_measure)
+
+                timeMeas?.text = history.t.toString()
+                accMeas?.text = history.a.toString()
+                viMeas?.text = history.vI.toString()
+                vfMeas?.text = history.vF.toString()
+                dxMeas?.text = history.dX.toString()
+
+                val clickListen: View.OnClickListener = View.OnClickListener {view: View ->
+                    val name = when (view) {
+                        timeMeas -> "time"
+                        accMeas -> "acceleration"
+                        viMeas -> "vinitial"
+                        vfMeas -> "vfinal"
+                        dxMeas -> "delta"
+                        else -> "unknown"
+                    }
+
+                    val valueToSave = (view as TextView).text.toString()
+                    val clip: ClipData = ClipData.newPlainText(name, valueToSave)
+                    manager.primaryClip = clip
+                }
+
+                timeMeas?.setOnClickListener(clickListen)
+                accMeas?.setOnClickListener(clickListen)
+                viMeas?.setOnClickListener(clickListen)
+                vfMeas?.setOnClickListener(clickListen)
+                dxMeas?.setOnClickListener(clickListen)
+            }
+        }
+    }
+
+    private fun setUpActionBar() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
@@ -95,7 +188,7 @@ class MainActivity : AppCompatActivity() {
         toolbar.addView(reset)
     }
 
-    fun setElements() {
+    private fun setElements() {
         vFInput = findViewById(R.id.vfinal_text)
         vIInput = findViewById(R.id.vinitial_text)
         dXInput = findViewById(R.id.deltax_text)
@@ -103,70 +196,43 @@ class MainActivity : AppCompatActivity() {
         tInput = findViewById(R.id.time_text)
     }
 
-    fun onReset(v: View?) {
-        vFInput.text = null
-        vIInput.text = null
-        dXInput.text = null
-        aInput.text = null
-        tInput.text = null
-
-        val manager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        manager.hideSoftInputFromWindow(window.currentFocus.windowToken, 0)
-
-        vFInput.clearFocus()
-        vIInput.clearFocus()
-        dXInput.clearFocus()
-        aInput.clearFocus()
-        tInput.clearFocus()
-    }
-
-    fun onCalc(v: View?) {
-        setVF()
-        setVI()
-        setDX()
-        setA()
-        setT()
-
-        checkNull()
-    }
-
-    fun checkNull() {
+    private fun checkNull() {
         val nulls: ArrayList<String> = ArrayList()
 
-        if (isNull(vF)) nulls.add(VF)
-        if (isNull(vI)) nulls.add(VI)
-        if (isNull(dX)) nulls.add(DX)
-        if (isNull(a)) nulls.add(A)
-        if (isNull(t)) nulls.add(T)
+        if (item.vF == null) nulls.add(VF_TEXT)
+        if (item.vI == null) nulls.add(VI_TEXT)
+        if (item.dX == null) nulls.add(DX_TEXT)
+        if (item.a == null) nulls.add(A_TEXT)
+        if (item.t == null) nulls.add(T_TEXT)
 
         if (nulls.size > 2) Toast.makeText(this, "Need at least three knowns", Toast.LENGTH_LONG).show()
         else doCalc(nulls)
     }
 
-    fun doCalc(nulls: ArrayList<String>) {
-        if (nulls.contains(VI)) {
+    private fun doCalc(nulls: ArrayList<String>) {
+        if (nulls.contains(VI_TEXT)) {
             solveForVI()
-            nulls.remove(VI)
+            nulls.remove(VI_TEXT)
         }
 
-        if (nulls.contains(VF)) {
+        if (nulls.contains(VF_TEXT)) {
             solveForVF()
-            nulls.remove(VF)
+            nulls.remove(VF_TEXT)
         }
 
-        if (nulls.contains(DX)) {
+        if (nulls.contains(DX_TEXT)) {
             solveForDX()
-            nulls.remove(DX)
+            nulls.remove(DX_TEXT)
         }
 
-        if (nulls.contains(A)) {
+        if (nulls.contains(A_TEXT)) {
             solveForA()
-            nulls.remove(A)
+            nulls.remove(A_TEXT)
         }
 
-        if (nulls.contains(T)) {
+        if (nulls.contains(T_TEXT)) {
             solveForT()
-            nulls.remove(T)
+            nulls.remove(T_TEXT)
         }
 
         saveHistory()
@@ -174,16 +240,16 @@ class MainActivity : AppCompatActivity() {
         onReset(null)
     }
 
-    fun saveHistory() {
+    private fun saveHistory() {
         val gBuilder = GsonBuilder()
         var json = sharedPreferences.getString("history_json", null)
-        val type = object: TypeToken<ArrayList<HistoryType>>(){}.type
+        val type = object: TypeToken<ArrayList<HistoryItem>>(){}.type
 
-        var historyList: ArrayList<HistoryType>? = gBuilder.serializeSpecialFloatingPointValues().create().fromJson(json, type)
+        var historyList: ArrayList<HistoryItem>? = gBuilder.serializeSpecialFloatingPointValues().create().fromJson(json, type)
 
         if (historyList == null) historyList = ArrayList()
 
-        val historyItem = HistoryType(vF, vI, dX, a, t, System.currentTimeMillis())
+        val historyItem = HistoryItem(item.vF, item.vI, item.dX, item.a, item.t, System.currentTimeMillis())
 
         historyList.add(0, historyItem)
 
@@ -192,217 +258,112 @@ class MainActivity : AppCompatActivity() {
         sharedPreferences.edit().putString("history_json", json).apply()
     }
 
-    fun printHistory(v: View?) {
-        val gson = GsonBuilder()
-        val json = sharedPreferences.getString("history_json", null)
-        val type = object: TypeToken<ArrayList<HistoryType>>(){}.type
-
-        var historyList: ArrayList<HistoryType>? = gson.serializeSpecialFloatingPointValues().create().fromJson(json, type)
-
-        if (historyList == null) historyList = ArrayList()
-
-        findViewById<LinearLayout>(R.id.history_layout).visibility = View.VISIBLE
-
-        if (historyList.size > 0) {
-            val history = historyList[0]
-
-            val date: TextView = findViewById(R.id.date_text)
-            val time: TextView = findViewById(R.id.time_history)
-            val acc: TextView = findViewById(R.id.acc_history)
-            val vi: TextView = findViewById(R.id.vinitial_history)
-            val vf: TextView = findViewById(R.id.vfinal_history)
-            val dx: TextView = findViewById(R.id.dx_history)
-
-            date.text = SimpleDateFormat("E MM/dd/yy hh:mm:ss a", Locale.getDefault()).format(history.time)
-            time.text = String.format("T (s) = %.4f", history.t)
-            acc.text = String.format("A (m/s²) = %.4f", history.a)
-            vi.text = String.format("VI (m/s) = %.4f", history.vI)
-            vf.text = String.format("VF (m/s) = %.4f", history.vF)
-            dx.text = String.format("Δx (m) = %.4f", history.dX)
-
-            val manager: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-
-            findViewById<LinearLayout>(R.id.history_layout).setOnClickListener {
-                val alertDialog = AlertDialog.Builder(this)
-                        .setTitle((findViewById<TextView>(R.id.date_text)).text.toString())
-                        .setView(R.layout.layout_full_history)
-                        .setPositiveButton("OK", null)
-                        .show()
-
-                val time: TextView? = alertDialog.findViewById(R.id.time_measure)
-                val acc: TextView? = alertDialog.findViewById(R.id.acc_measure)
-                val vi: TextView? = alertDialog.findViewById(R.id.vi_measure)
-                val vf: TextView? = alertDialog.findViewById(R.id.vf_measure)
-                val dx: TextView? = alertDialog.findViewById(R.id.dx_measure)
-
-                time?.text = history.t.toString()
-                acc?.text = history.a.toString()
-                vi?.text = history.vI.toString()
-                vf?.text = history.vF.toString()
-                dx?.text = history.dX.toString()
-
-                val clickListen: View.OnClickListener = View.OnClickListener {view: View ->
-                    var name = "unknown"
-
-                    when (view) {
-                        time -> name = "time"
-                        acc -> name = "acceleration"
-                        vi -> name = "vinitial"
-                        vf -> name = "vfinal"
-                        dx -> name = "delta"
-                    }
-
-                    val valueToSave = (view as TextView).text.toString()
-                    val clip: ClipData = ClipData.newPlainText(name, valueToSave)
-                    manager.primaryClip = clip
-
-                    Toast.makeText(this, "$name copied to clipboard", Toast.LENGTH_SHORT).show()
-                }
-
-                time?.setOnClickListener(clickListen)
-                acc?.setOnClickListener(clickListen)
-                vi?.setOnClickListener(clickListen)
-                vf?.setOnClickListener(clickListen)
-                dx?.setOnClickListener(clickListen)
-            }
-        }
-    }
-
-    fun isNull(num: Double): Boolean {
-        return num == Double.NEGATIVE_INFINITY
-    }
-
-    fun solveForVF() {
-        //vF = a * t + vI
-        //vF = 2 * dX / t - vI
-        //vF = sqrt(2 * a * deltaX + vInitial^2)
-
-        //check vI not null
-
-        var value: Double = Double.NEGATIVE_INFINITY
-
-        if (!isNull(a)
-                && !isNull(t)) {
-            Log.e("VF", "1")
-            value = a * t + vI
-        }
-        else if (!isNull(dX)
-                     && !isNull(t)) {
-            Log.e("VF", "2")
-            value = 2 * dX / t - vI
-        }
-        else if (!isNull(a)
-                     && !isNull(dX)) {
-            Log.e("VF", "3")
-            value = Math.sqrt(2 * a * dX + vI * vI)
-
-            if (dX < 0) value = -value
-        }
-
-        logAll("VF")
-        vF = value
-        vFInput.setText(value.toString())
-    }
-
-    fun solveForVI() {
+    private fun solveForVI() {
         //vI = vF - a * t
         //vI = 2 * dX / t - vF
         //vI = (dX - 0.5 * a * t^2) / t
         //vI = sqrt(vF^2 - 2 * a * dX)
 
-        var value: Double = Double.NEGATIVE_INFINITY
+        var value: Double? = null
 
-        if (!isNull(vF)
-                && !isNull(a)
-                && !isNull(t)) {
-            Log.e("VI", "1")
-            value = vF - a * t
+        if (item.vF != null && item.a != null && item.t != null) {
+            Log.e(VI_TEXT, "1")
+            value = item.vF!! - item.a!! * item.t!!
         }
-        else if (!isNull(t)
-                && !isNull(vF)
-                     && !isNull(dX)) {
-            Log.e("VI", "2")
-            value = 2 * dX / t - vF
+        else if (item.t != null && item.vF != null && item.dX != null) {
+            Log.e(VI_TEXT, "2")
+            value = 2 * item.dX!! / item.t!! - item.vF!!
         }
-        else if (!isNull(a)
-                     && !isNull(t)
-                     && !isNull(dX)) {
-            Log.e("VI", "3")
-            value = (dX - 0.5 * a * t * t) / t
+        else if (item.a != null && item.t != null && item.dX != null) {
+            Log.e(VI_TEXT, "3")
+            value = (item.dX!! - 0.5 * item.a!! * item.t!! * item.t!!) / item.t!!
         }
-        else if (!isNull(vF)
-                     && !isNull(a)
-                     && !isNull(dX)) {
-            Log.e("VI", "4")
-            value = Math.sqrt(vF * vF - 2 * a * dX)
+        else if (item.vF != null && item.a != null && item.dX != null) {
+            Log.e(VI_TEXT, "4")
+            value = Math.sqrt(item.vF!! * item.vF!! - 2 * item.a!! * item.dX!!)
         }
 
-        logAll("VI")
-        vI = value
+        logAll(VI_TEXT)
+        item.vI = value
         vIInput.setText(value.toString())
     }
 
-    fun solveForDX() {
+    private fun solveForVF() {
+        //vF = a * t + vI
+        //vF = 2 * dX / t - vI
+        //vF = sqrt(2 * a * deltaX + vInitial^2)
+
+        var value: Double? = null
+
+        if (item.a != null && item.t != null) {
+            Log.e(VF_TEXT, "1")
+            value = item.a!! * item.t!! + item.vI!!
+        } else if (item.dX != null && item.t != null) {
+            Log.e(VF_TEXT, "2")
+            value = 2 * item.dX!! / item.t!! - item.vI!!
+        } else if (item.a != null && item.dX != null) {
+            Log.e(VF_TEXT, "3")
+            value = Math.sqrt(2 * item.a!! * item.dX!! + item.vI!! * item.vI!!)
+
+            if (item.dX!! < 0) value = -value
+        }
+
+        logAll(VF_TEXT)
+        item.vF = value
+        vFInput.setText(value.toString())
+    }
+
+    private fun solveForDX() {
         //dX = 0.5 * a * t^2 + vI * t
         //dX = 0.5 * (vI + vF) * t
-        //dX = (vF^2 - vI^2) / 2 * a
+        //dX = (vF^2 - vI^2) / (2 * a)
 
-        //check vI not null
+        var value: Double? = null
 
-        var value: Double = Double.NEGATIVE_INFINITY
-
-        if (!isNull(a)
-                && !isNull(t)) {
-            Log.e("DX", "1")
-            value = 0.5 * a * t * t + vI * t
+        if (item.a != null && item.t != null) {
+            Log.e(DX_TEXT, "1")
+            value = 0.5 * item.a!! * item.t!! * item.t!! + item.vI!! * item.t!!
         }
-        else if (!isNull(vF)
-                     && !isNull(t)) {
-            Log.e("DX", "2")
-            value = 0.5 * (vI + vF) * t
+        else if (item.vF != null && item.t != null) {
+            Log.e(DX_TEXT, "2")
+            value = 0.5 * (item.vI!! + item.vF!!) * item.t!!
         }
-        else if (!isNull(vF)
-                     && !isNull(a) && a != 0.0) {
-            Log.e("DX", "3")
-            value = (vF * vF - vI * vI) / 2 * a
+        else if (item.vF != null && item.a != null && item.a != 0.0) {
+            Log.e(DX_TEXT, "3")
+            value = (item.vF!! * item.vF!! - item.vI!! * item.vI!!) / (2 * item.a!!)
         }
 
-        logAll("DX")
-        dX = value
+        logAll(DX_TEXT)
+        item.dX = value
         dXInput.setText(value.toString())
     }
 
-    fun solveForA() {
+    private fun solveForA() {
         //a = (vF - vI) / t
         //a = 2 * (dX - vI * t) / t^2
         //a = (vF^2 - vI^2) / 2 * dX
 
-        //check vI not null
+        var value: Double? = null
 
-        var value: Double = Double.NEGATIVE_INFINITY
-
-        if (!isNull(vF)
-                && !isNull(t)) {
-            Log.e("A", "1")
-            value = (vF - vI) / t
+        if (item.vF != null && item.t != null) {
+            Log.e(A_TEXT, "1")
+            value = (item.vF!! - item.vI!!) / item.t!!
         }
-        else if (!isNull(dX)
-                     && !isNull(t)) {
-            Log.e("A", "2")
-            value = 2 * (dX - vI * t) / t * t
+        else if (item.dX != null && item.t != null) {
+            Log.e(A_TEXT, "2")
+            value = 2 * (item.dX!! - item.vI!! * item.t!!) / item.t!! * item.t!!
         }
-        else if (!isNull(vF)
-                     && !isNull(dX)) {
-            Log.e("A", "3")
-            value = (vF * vF - vI * vI) / 2 * dX
+        else if (item.vF != null && item.dX != null) {
+            Log.e(A_TEXT, "3")
+            value = (item.vF!! * item.vF!! - item.vI!! * item.vI!!) / 2 * item.dX!!
         }
 
-        logAll("A")
-        a = value
+        logAll(A_TEXT)
+        item.a = value
         aInput.setText(value.toString())
     }
 
-    fun solveForT() {
+    private fun solveForT() {
         //t = (vF - vI) / a
         /**
          * 0 = (a / 2) * t^2 + (vI) * t - dX
@@ -411,92 +372,85 @@ class MainActivity : AppCompatActivity() {
          */
         //t = 2 * dX / (vI + vF)
 
-        //check vI not null
+        var value: Double? = null
 
-        var value: Double = Double.NEGATIVE_INFINITY
-
-        if (!isNull(vF)
-                && !isNull(a) && a != 0.0) {
-            Log.e("T", "1")
-            value = (vF - vI) / a
-        }
-        else if (!isNull(dX)
-                && !isNull(vF)) {
-            Log.e("T", "2")
-            value = 2 * dX / (vI + vF)
-        }
-        else if (!isNull(a)
-                     && !isNull(t)
-                     && !isNull(dX)) {
-            Log.e("T", "3")
-            value = (-vI + Math.sqrt(vI * vI - 2 * a * -dX)) / a
+        if (item.vF != null
+                && item.a != null && item.a != 0.0) {
+            Log.e(T_TEXT, "1")
+            value = (item.vF!! - item.vI!!) / item.a!!
+        } else if (item.dX != null && item.vF != null) {
+            Log.e(T_TEXT, "2")
+            value = 2 * item.dX!! / (item.vI!! + item.vF!!)
+        } else if (item.a != null && item.t != null && item.dX != null) {
+            Log.e(T_TEXT, "3")
+            value = (-item.vI!! + Math.sqrt(item.vI!! * item.vI!! - 2 * item.a!! * -item.dX!!)) / item.a!!
 
             if (value < 0) {
-                value = (-vI - Math.sqrt(vI * vI - 2 * a * -dX)) / a
+                value = (-item.vI!! - Math.sqrt(item.vI!! * item.vI!! - 2 * item.a!! * -item.dX!!)) / item.a!!
             }
         }
 
-        logAll("T")
-        t = value
+        logAll(T_TEXT)
+        item.t = value
         tInput.setText(value.toString())
     }
 
-    fun setVF() {
+    private fun setVF() {
         val input = vFInput.text.toString()
 
-        try {
-            vF = input.toDouble()
+        item.vF = try {
+            input.toDouble()
         } catch (e: NumberFormatException) {
-            vF = Double.NEGATIVE_INFINITY
+            null
         }
     }
 
-    fun setVI() {
+    private fun setVI() {
         val input = vIInput.text.toString()
 
-        try {
-            vI = input.toDouble()
+        item.vI = try {
+            input.toDouble()
         } catch (e: NumberFormatException) {
-            vI = Double.NEGATIVE_INFINITY
+            null
         }
     }
 
-    fun setDX() {
+    private fun setDX() {
         val input = dXInput.text.toString()
 
-        try {
-            dX = input.toDouble()
+        item.dX = try {
+            input.toDouble()
         } catch (e: NumberFormatException) {
-            dX = Double.NEGATIVE_INFINITY
+            null
         }
     }
 
-    fun setA() {
+    private fun setA() {
         val input = aInput.text.toString()
 
-        try {
-            a = input.toDouble()
+        item.a = try {
+            input.toDouble()
         } catch (e: NumberFormatException) {
-            a = Double.NEGATIVE_INFINITY
+            null
         }
     }
 
-    fun setT() {
+    private fun setT() {
         val input = tInput.text.toString()
 
-        try {
-            t = input.toDouble()
+        item.t = try {
+            input.toDouble()
         } catch (e: NumberFormatException) {
-            t = Double.NEGATIVE_INFINITY
+            null
         }
     }
 
-    fun logAll(source: String) {
+    private fun logAll(source: String) {
         Log.e("Source", source)
-        Log.e("VFVal", vF.toString())
-        Log.e("VIVal", vI.toString())
-        Log.e("DXVal", dX.toString())
-        Log.e("AVal", a.toString())
-        Log.e("TVal", t.toString())
+        Log.e("VFVal", item.vF.toString())
+        Log.e("VIVal", item.vI.toString())
+        Log.e("DXVal", item.dX.toString())
+        Log.e("AVal", item.a.toString())
+        Log.e("TVal", item.t.toString())
     }
 }

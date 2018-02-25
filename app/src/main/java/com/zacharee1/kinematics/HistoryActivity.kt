@@ -20,11 +20,8 @@ import android.view.animation.OvershootInterpolator
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import jp.wasabeef.recyclerview.adapters.SlideInBottomAnimationAdapter
-import jp.wasabeef.recyclerview.adapters.SlideInLeftAnimationAdapter
 import jp.wasabeef.recyclerview.animators.FadeInAnimator
 import java.text.SimpleDateFormat
 import java.util.*
@@ -49,9 +46,9 @@ class HistoryActivity : AppCompatActivity() {
 
         val gson = GsonBuilder()
         val json = sharedPreferences.getString("history_json", null)
-        val type = object: TypeToken<ArrayList<HistoryType>>(){}.type
+        val type = object: TypeToken<ArrayList<HistoryItem>>(){}.type
 
-        var historyList: ArrayList<HistoryType>? = gson.serializeSpecialFloatingPointValues().create().fromJson(json, type)
+        var historyList: ArrayList<HistoryItem>? = gson.serializeSpecialFloatingPointValues().create().fromJson(json, type)
 
         if (historyList == null) historyList = ArrayList()
 
@@ -65,7 +62,7 @@ class HistoryActivity : AppCompatActivity() {
         recView.itemAnimator = FadeInAnimator(OvershootInterpolator())
     }
 
-    class CustomAdapter constructor(historyList: ArrayList<HistoryType>, context: Context) : RecyclerView.Adapter<CustomAdapter.CustomHolder>() {
+    class CustomAdapter constructor(historyList: ArrayList<HistoryItem>, context: Context) : RecyclerView.Adapter<CustomAdapter.CustomHolder>() {
         private val historyList = historyList
         private val context = context
 
@@ -91,9 +88,10 @@ class HistoryActivity : AppCompatActivity() {
                         .setTitle("Delete?")
                         .setMessage("Remove From History?")
                         .setPositiveButton("Yes", { _, _ ->
-                            historyList.removeAt(position)
+                            val newIndex = historyList.indexOf(history)
+                            historyList.remove(history)
                             saveNewHistory(historyList)
-                            notifyItemRemoved(position)
+                            notifyItemRemoved(newIndex)
                         })
                         .setNegativeButton("No", null)
                         .show()
@@ -161,7 +159,7 @@ class HistoryActivity : AppCompatActivity() {
             return historyList.size
         }
 
-        fun saveNewHistory(list: ArrayList<HistoryType>) {
+        fun saveNewHistory(list: ArrayList<HistoryItem>) {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
             val gson = GsonBuilder()
