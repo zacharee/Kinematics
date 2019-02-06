@@ -1,72 +1,109 @@
 package com.zacharee1.kinematics
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.SharedPreferences
+import android.graphics.*
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.view.animation.OvershootInterpolator
-import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import jp.wasabeef.recyclerview.animators.FadeInAnimator
+import kotlinx.android.synthetic.main.activity_history.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
 class HistoryActivity : AppCompatActivity() {
-    private lateinit var sharedPreferences: SharedPreferences
+    private val sharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
+    private val adapter by lazy {
+        val gson = GsonBuilder()
+        val json = sharedPreferences.getString("history_json", null)
+        val type = object: TypeToken<ArrayList<HistoryItem>>(){}.type
+
+        CustomAdapter(gson
+                .serializeSpecialFloatingPointValues()
+                .create().fromJson(json, type) ?: ArrayList(), history_list)
+    }
+
+    private val touchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+            return false
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            adapter.removeItem(viewHolder.adapterPosition)
+        }
+
+        override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
+            val itemView = viewHolder.itemView
+            val height = itemView.bottom - itemView.top
+            val icon = ContextCompat.getDrawable(this@HistoryActivity, R.drawable.ic_delete_black_24dp)!!
+                    .apply { setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN) }
+
+            val canceled = dX == 0f && !isCurrentlyActive
+
+            if (canceled) {
+                c.drawRect(itemView.left.toFloat(), itemView.top.toFloat(), itemView.right.toFloat(), itemView.bottom.toFloat(),
+                        Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) })
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+
+                return
+            }
+
+            val background = ColorDrawable()
+            background.color = ContextCompat.getColor(this@HistoryActivity, R.color.delete)
+            background.bounds = Rect(itemView.left, itemView.top, itemView.right, itemView.bottom)
+            background.draw(c)
+
+            val iconMargin = (height - icon.intrinsicHeight) / 4
+
+            val iconLeft = if (dX < 0) itemView.right - iconMargin - icon.intrinsicWidth else itemView.left + iconMargin
+            val iconTop = itemView.top + (height - icon.intrinsicHeight) / 2
+            val iconRight = if (dX < 0) itemView.right - iconMargin else itemView.left + iconMargin + icon.intrinsicWidth
+            val iconBottom = iconTop + icon.intrinsicHeight
+
+            icon.bounds = Rect(iconLeft, iconTop, iconRight, iconBottom)
+            icon.draw(c)
+
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        }
+    })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-
-        val recView: RecyclerView = findViewById(R.id.history_list)
-        recView.setHasFixedSize(true)
+        history_list.setHasFixedSize(true)
 
         val llm = LinearLayoutManager(this)
         llm.orientation = LinearLayoutManager.VERTICAL
 
-        recView.layoutManager = llm
+        history_list.layoutManager = llm
+        history_list.adapter = adapter
 
-        val gson = GsonBuilder()
-        val json = sharedPreferences.getString("history_json", null)
-        val type = object: TypeToken<ArrayList<HistoryItem>>(){}.type
-
-        var historyList: ArrayList<HistoryItem>? = gson.serializeSpecialFloatingPointValues().create().fromJson(json, type)
-
-        if (historyList == null) historyList = ArrayList()
-
-        val adapter = CustomAdapter(historyList, this)
-
-        recView.adapter = adapter
+        touchHelper.attachToRecyclerView(history_list)
 
         val decorator = DividerItemDecoration(this, llm.orientation)
 
-        recView.addItemDecoration(decorator)
-        recView.itemAnimator = FadeInAnimator(OvershootInterpolator())
+        history_list.addItemDecoration(decorator)
+        history_list.itemAnimator = FadeInAnimator(OvershootInterpolator())
     }
 
-    class CustomAdapter constructor(historyList: ArrayList<HistoryItem>, context: Context) : RecyclerView.Adapter<CustomAdapter.CustomHolder>() {
-        private val historyList = historyList
-        private val context = context
-
-        private var lastPosition = -1
+    class CustomAdapter constructor(
+            private val historyList: ArrayList<HistoryItem>,
+            private val snackView: View) : RecyclerView.Adapter<CustomAdapter.CustomHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomHolder {
             val view = LayoutInflater.from(parent.context)
@@ -78,95 +115,29 @@ class HistoryActivity : AppCompatActivity() {
             val history = historyList[position]
 
             holder.date.text = SimpleDateFormat("E MM/dd/yy hh:mm:ss a", Locale.getDefault()).format(history.time)
-            holder.time.text = String.format("T (s) = %.4f", history.t)
-            holder.acc.text = String.format("A (m/s²) = %.4f", history.a)
-            holder.vi.text = String.format("VI (m/s) = %.4f", history.vI)
-            holder.vf.text = String.format("VF (m/s) = %.4f", history.vF)
-            holder.dx.text = String.format("Δx (m) = %.4f", history.dX)
-
-            holder.layout.setOnLongClickListener {
-                AlertDialog.Builder(holder.itemView.context)
-                        .setTitle("Delete?")
-                        .setMessage("Remove From History?")
-                        .setPositiveButton("Yes") { _, _ ->
-                            val newIndex = historyList.indexOf(history)
-                            historyList.remove(history)
-                            saveNewHistory(historyList)
-                            notifyItemRemoved(newIndex)
-                        }
-                        .setNegativeButton("No", null)
-                        .show()
-                true
-            }
-
-            val manager: ClipboardManager = holder.itemView.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-
-            holder.layout.setOnClickListener {
-                val alertDialog = AlertDialog.Builder(holder.itemView.context)
-                        .setTitle(holder.date.text)
-                        .setView(R.layout.layout_full_history)
-                        .setPositiveButton("OK", null)
-                        .show()
-
-                val time: TextView? = alertDialog.findViewById(R.id.time_measure)
-                val acc: TextView? = alertDialog.findViewById(R.id.acc_measure)
-                val vi: TextView? = alertDialog.findViewById(R.id.vi_measure)
-                val vf: TextView? = alertDialog.findViewById(R.id.vf_measure)
-                val dx: TextView? = alertDialog.findViewById(R.id.dx_measure)
-
-                time?.text = history.t.toString()
-                acc?.text = history.a.toString()
-                vi?.text = history.vI.toString()
-                vf?.text = history.vF.toString()
-                dx?.text = history.dX.toString()
-
-                val clickListen: View.OnClickListener = View.OnClickListener {view: View ->
-                    var name = "unknown"
-
-                    when (view) {
-                        time -> name = "time"
-                        acc -> name = "acceleration"
-                        vi -> name = "vinitial"
-                        vf -> name = "vfinal"
-                        dx -> name = "delta"
-                    }
-
-                    val valueToSave = (view as TextView).text.toString()
-                    val clip: ClipData = ClipData.newPlainText(name, valueToSave)
-                    manager.primaryClip = clip
-
-                    Toast.makeText(holder.itemView.context, "$name copied to clipboard", Toast.LENGTH_SHORT).show()
-                }
-
-                time?.setOnClickListener(clickListen)
-                acc?.setOnClickListener(clickListen)
-                vi?.setOnClickListener(clickListen)
-                vf?.setOnClickListener(clickListen)
-                dx?.setOnClickListener(clickListen)
-            }
-
-            setAnimation(holder.itemView, position)
-        }
-
-        fun setAnimation(animateView: View, position: Int) {
-            if (position > lastPosition) {
-                val animation: Animation = AnimationUtils.loadAnimation(animateView.context, android.R.anim.slide_in_left)
-                animateView.startAnimation(animation)
-                lastPosition = position
-            }
+            holder.time.text = "${history.t}"
+            holder.acc.text = "${history.a}"
+            holder.vi.text = "${history.vI}"
+            holder.vf.text = "${history.vF}"
+            holder.dx.text = "${history.dX}"
         }
 
         override fun getItemCount(): Int {
             return historyList.size
         }
 
-        fun saveNewHistory(list: ArrayList<HistoryItem>) {
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        fun removeItem(position: Int) {
+            val item = historyList.removeAt(position)
+            notifyItemRemoved(position)
 
-            val gson = GsonBuilder()
-            val json = gson.serializeSpecialFloatingPointValues().create().toJson(list)
-
-            sharedPreferences.edit().putString("history_json", json).apply()
+            Snackbar.make(snackView, R.string.removed, Snackbar.LENGTH_LONG)
+                    .apply {
+                        setAction(R.string.undo) {
+                            historyList.add(position, item)
+                            notifyItemInserted(position)
+                        }
+                        show()
+                    }
         }
 
         class CustomHolder constructor(v: View) : RecyclerView.ViewHolder(v) {
@@ -176,9 +147,6 @@ class HistoryActivity : AppCompatActivity() {
             val vi: TextView = v.findViewById(R.id.vinitial_history)
             val vf: TextView = v.findViewById(R.id.vfinal_history)
             val dx: TextView = v.findViewById(R.id.dx_history)
-
-            val layout: LinearLayout = v.findViewById(R.id.history_layout)
-
         }
     }
 }

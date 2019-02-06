@@ -1,85 +1,203 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/history_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true"
-    android:orientation="vertical"
-    android:padding="5dp">
+    android:background="?android:colorBackground">
 
-    <TextView
-        android:id="@+id/date_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        />
+   <LinearLayout
+       android:clickable="true"
+       android:focusable="true"
+       android:orientation="vertical"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:padding="@dimen/history_item_padding"
+       android:background="?android:attr/selectableItemBackground">
 
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:stretchColumns="0,1">
+       <TextView
+           android:id="@+id/date_text"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:textSize="@dimen/history_date_text_size"
+           android:textColor="?colorAccent"
+           android:layout_marginBottom="@dimen/history_date_margin_bottom"
+           />
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+       <TableLayout
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:stretchColumns="0,1">
 
-            <TextView
-                android:id="@+id/time_history"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                />
+           <TableRow
+               android:layout_width="match_parent"
+               android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/acc_history"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                />
+               <LinearLayout
+                   android:id="@+id/time_wrapper"
+                   android:layout_width="0dp"
+                   android:layout_height="wrap_content"
+                   android:layout_weight="1"
+                   android:gravity="center_horizontal"
+                   android:orientation="vertical">
 
-        </TableRow>
+                   <com.zacharee1.kinematics.views.HtmlTextView
+                       android:id="@+id/time_label"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:textAlignment="center"
+                       android:textSize="@dimen/history_label_text_size"
+                       android:text="@string/time"
+                       />
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+                   <EditText
+                       android:id="@+id/time_history"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:textAlignment="center"
+                       android:textSize="@dimen/history_result_text_size"
+                       android:inputType="none"
+                       android:textIsSelectable="true"
+                       android:editable="false"
+                       />
 
-            <TextView
-                android:id="@+id/vinitial_history"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                />
+               </LinearLayout>
 
-            <TextView
-                android:id="@+id/vfinal_history"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                />
+               <LinearLayout
+                   android:id="@+id/acc_wrapper"
+                   android:layout_width="0dp"
+                   android:layout_height="wrap_content"
+                   android:layout_weight="1"
+                   android:gravity="center_horizontal"
+                   android:orientation="vertical">
 
-        </TableRow>
+                   <com.zacharee1.kinematics.views.HtmlTextView
+                       android:id="@+id/acc_label"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:textAlignment="center"
+                       android:textSize="@dimen/history_label_text_size"
+                       android:text="@string/acceleration"
+                       />
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal">
+                   <EditText
+                       android:id="@+id/acc_history"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:textAlignment="center"
+                       android:textSize="@dimen/history_result_text_size"
+                       android:inputType="none"
+                       android:textIsSelectable="true"
+                       android:editable="false"
+                       />
 
-            <TextView
-                android:id="@+id/dx_history"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                />
+               </LinearLayout>
 
-        </TableRow>
+           </TableRow>
 
-    </TableLayout>
-</LinearLayout>
+           <TableRow
+               android:layout_width="match_parent"
+               android:layout_height="match_parent">
+
+               <LinearLayout
+                   android:id="@+id/vinitial_wrapper"
+                   android:layout_width="0dp"
+                   android:layout_height="wrap_content"
+                   android:layout_weight="1"
+                   android:gravity="center_horizontal"
+                   android:orientation="vertical">
+
+                   <com.zacharee1.kinematics.views.HtmlTextView
+                       android:id="@+id/vinitial_label"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:textAlignment="center"
+                       android:textSize="@dimen/history_label_text_size"
+                       android:text="@string/v_initial"
+                       />
+
+                   <EditText
+                       android:id="@+id/vinitial_history"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:textAlignment="center"
+                       android:textSize="@dimen/history_result_text_size"
+                       android:inputType="none"
+                       android:textIsSelectable="true"
+                       android:editable="false"
+                       />
+
+               </LinearLayout>
+
+               <LinearLayout
+                   android:id="@+id/vfinal_wrapper"
+                   android:layout_width="0dp"
+                   android:layout_height="wrap_content"
+                   android:layout_weight="1"
+                   android:gravity="center_horizontal"
+                   android:orientation="vertical">
+
+                   <com.zacharee1.kinematics.views.HtmlTextView
+                       android:id="@+id/vfinal_label"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:textAlignment="center"
+                       android:textSize="@dimen/history_label_text_size"
+                       android:text="@string/v_final"
+                       />
+
+                   <EditText
+                       android:id="@+id/vfinal_history"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:textAlignment="center"
+                       android:textSize="@dimen/history_result_text_size"
+                       android:inputType="none"
+                       android:textIsSelectable="true"
+                       android:editable="false"
+                       />
+
+               </LinearLayout>
+
+           </TableRow>
+
+           <TableRow
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:gravity="center_horizontal">
+
+               <LinearLayout
+                   android:id="@+id/dx_wrapper"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:gravity="center_horizontal"
+                   android:orientation="vertical">
+
+                   <com.zacharee1.kinematics.views.HtmlTextView
+                       android:id="@+id/dx_label"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:textAlignment="center"
+                       android:textSize="@dimen/history_label_text_size"
+                       android:text="@string/delta_x"
+                       />
+
+                   <EditText
+                       android:id="@+id/dx_history"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:textAlignment="center"
+                       android:textSize="@dimen/history_result_text_size"
+                       android:inputType="none"
+                       android:textIsSelectable="true"
+                       android:editable="false"
+                       />
+
+               </LinearLayout>
+
+           </TableRow>
+
+       </TableLayout>
+
+   </LinearLayout>
+
+</FrameLayout>

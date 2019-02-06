@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="table_row_height">30dp</dimen>
-    <dimen name="detail_margin_side">5dp</dimen>
+    <dimen name="history_item_padding">5dp</dimen>
+
+    <dimen name="history_date_margin_bottom">16dp</dimen>
+
+    <dimen name="history_date_text_size">18sp</dimen>
+    <dimen name="history_label_text_size">16sp</dimen>
+    <dimen name="history_result_text_size">16sp</dimen>
 </resources>

@@ -1,10 +1,17 @@
 <resources>
     <string name="app_name">Kinematics</string>
 
+    <string name="removed">Removed</string>
+    <string name="undo">Undo</string>
+    <string name="history">History</string>
+    <string name="calculate">Calculate</string>
+    <string name="reset">Reset</string>
+
     <string name="time">Time (s)</string>
     <string name="acceleration"><![CDATA[Acceleration (m/s<sup>2</sup>)]]></string>
     <string name="v_initial"><![CDATA[Velocity<sub>i</sub> (m/s)]]></string>
     <string name="v_final"><![CDATA[Velocity<sub>f</sub> (m/s)]]></string>
     <string name="delta_x">Δx (m)</string>
 
+    <string name="need_three_knowns">Enter at least three known values</string>
 </resources>

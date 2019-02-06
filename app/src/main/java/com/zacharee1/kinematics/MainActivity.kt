@@ -1,6 +1,8 @@
 package com.zacharee1.kinematics
 
-import android.content.*
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
@@ -8,15 +10,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.history_layout.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,12 +38,6 @@ class MainActivity : AppCompatActivity() {
 
     private val item = KinematicsItem(0.0, 0.0, 0.0, 0.0, 0.0)
 
-    private lateinit var vFInput: TextInputEditText
-    private lateinit var vIInput: TextInputEditText
-    private lateinit var dXInput: TextInputEditText
-    private lateinit var aInput: TextInputEditText
-    private lateinit var tInput: TextInputEditText
-
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +47,6 @@ class MainActivity : AppCompatActivity() {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         setUpActionBar()
-        setElements()
     }
 
     fun onCalc(v: View?) {
@@ -67,20 +60,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onReset(v: View?) {
-        vFInput.text = null
-        vIInput.text = null
-        dXInput.text = null
-        aInput.text = null
-        tInput.text = null
+        vfinal_text.text = null
+        vinitial_text.text = null
+        deltax_text.text = null
+        acc_text.text = null
+        time_text.text = null
 
         val manager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         manager.hideSoftInputFromWindow(window?.currentFocus?.windowToken, 0)
 
-        vFInput.clearFocus()
-        vIInput.clearFocus()
-        dXInput.clearFocus()
-        aInput.clearFocus()
-        tInput.clearFocus()
+        vfinal_text.clearFocus()
+        vinitial_text.clearFocus()
+        deltax_text.clearFocus()
+        acc_text.clearFocus()
+        time_text.clearFocus()
     }
 
     fun printHistory(v: View?) {
@@ -92,72 +85,21 @@ class MainActivity : AppCompatActivity() {
 
         if (historyList == null) historyList = ArrayList()
 
-        findViewById<LinearLayout>(R.id.history_layout).visibility = View.VISIBLE
+        history_layout.visibility = View.VISIBLE
 
         if (historyList.size > 0) {
             val history = historyList[0]
 
-            val date: TextView = findViewById(R.id.date_text)
-            val time: TextView = findViewById(R.id.time_history)
-            val acc: TextView = findViewById(R.id.acc_history)
-            val vi: TextView = findViewById(R.id.vinitial_history)
-            val vf: TextView = findViewById(R.id.vfinal_history)
-            val dx: TextView = findViewById(R.id.dx_history)
-
-            date.text = SimpleDateFormat("E MM/dd/yy hh:mm:ss a", Locale.getDefault()).format(history.time)
-            time.text = String.format("T (s) = %.4f", history.t)
-            acc.text = String.format("A (m/s²) = %.4f", history.a)
-            vi.text = String.format("VI (m/s) = %.4f", history.vI)
-            vf.text = String.format("VF (m/s) = %.4f", history.vF)
-            dx.text = String.format("Δx (m) = %.4f", history.dX)
-
-            val manager: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-
-            findViewById<LinearLayout>(R.id.history_layout).setOnClickListener {
-                val alertDialog = AlertDialog.Builder(this)
-                        .setTitle((findViewById<TextView>(R.id.date_text)).text.toString())
-                        .setView(R.layout.layout_full_history)
-                        .setPositiveButton("OK", null)
-                        .show()
-
-                val timeMeas: TextView? = alertDialog.findViewById(R.id.time_measure)
-                val accMeas: TextView? = alertDialog.findViewById(R.id.acc_measure)
-                val viMeas: TextView? = alertDialog.findViewById(R.id.vi_measure)
-                val vfMeas: TextView? = alertDialog.findViewById(R.id.vf_measure)
-                val dxMeas: TextView? = alertDialog.findViewById(R.id.dx_measure)
-
-                timeMeas?.text = history.t.toString()
-                accMeas?.text = history.a.toString()
-                viMeas?.text = history.vI.toString()
-                vfMeas?.text = history.vF.toString()
-                dxMeas?.text = history.dX.toString()
-
-                val clickListen: View.OnClickListener = View.OnClickListener {view: View ->
-                    val name = when (view) {
-                        timeMeas -> "time"
-                        accMeas -> "acceleration"
-                        viMeas -> "vinitial"
-                        vfMeas -> "vfinal"
-                        dxMeas -> "delta"
-                        else -> "unknown"
-                    }
-
-                    val valueToSave = (view as TextView).text.toString()
-                    val clip: ClipData = ClipData.newPlainText(name, valueToSave)
-                    manager.primaryClip = clip
-                }
-
-                timeMeas?.setOnClickListener(clickListen)
-                accMeas?.setOnClickListener(clickListen)
-                viMeas?.setOnClickListener(clickListen)
-                vfMeas?.setOnClickListener(clickListen)
-                dxMeas?.setOnClickListener(clickListen)
-            }
+            date_text.text = SimpleDateFormat("E MM/dd/yy hh:mm:ss a", Locale.getDefault()).format(history.time)
+            time_history.setText("${history.t}")
+            acc_history.setText("${history.a}")
+            vinitial_history.setText("${history.vI}")
+            vfinal_history.setText("${history.vF}")
+            dx_history.setText("${history.dX}")
         }
     }
 
     private fun setUpActionBar() {
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         val history = LayoutInflater.from(this).inflate(R.layout.history_button, toolbar, false) as ImageView
@@ -175,29 +117,21 @@ class MainActivity : AppCompatActivity() {
         }
 
         history.setOnLongClickListener {
-            Toast.makeText(this, "History", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.history, Toast.LENGTH_SHORT).show()
             true
         }
         calc.setOnLongClickListener {
-            Toast.makeText(this, "Calculate", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.calculate, Toast.LENGTH_SHORT).show()
             true
         }
         reset.setOnLongClickListener {
-            Toast.makeText(this, "Reset", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.reset, Toast.LENGTH_SHORT).show()
             true
         }
 
         toolbar.addView(history)
         toolbar.addView(calc)
         toolbar.addView(reset)
-    }
-
-    private fun setElements() {
-        vFInput = findViewById(R.id.vfinal_text)
-        vIInput = findViewById(R.id.vinitial_text)
-        dXInput = findViewById(R.id.deltax_text)
-        aInput = findViewById(R.id.acc_text)
-        tInput = findViewById(R.id.time_text)
     }
 
     private fun checkNull() {
@@ -209,7 +143,7 @@ class MainActivity : AppCompatActivity() {
         if (item.a == null) nulls.add(A_TEXT)
         if (item.t == null) nulls.add(T_TEXT)
 
-        if (nulls.size > 2) Toast.makeText(this, "Need at least three knowns", Toast.LENGTH_LONG).show()
+        if (nulls.size > 2) Toast.makeText(this, R.string.need_three_knowns, Toast.LENGTH_LONG).show()
         else doCalc(nulls)
     }
 
@@ -289,7 +223,7 @@ class MainActivity : AppCompatActivity() {
 
         logAll(VI_TEXT)
         item.vI = value
-        vIInput.setText(value.toString())
+        vinitial_text.setText(value.toString())
     }
 
     private fun solveForVF() {
@@ -314,7 +248,7 @@ class MainActivity : AppCompatActivity() {
 
         logAll(VF_TEXT)
         item.vF = value
-        vFInput.setText(value.toString())
+        vfinal_text.setText(value.toString())
     }
 
     private fun solveForDX() {
@@ -339,7 +273,7 @@ class MainActivity : AppCompatActivity() {
 
         logAll(DX_TEXT)
         item.dX = value
-        dXInput.setText(value.toString())
+        deltax_text.setText(value.toString())
     }
 
     private fun solveForA() {
@@ -364,7 +298,7 @@ class MainActivity : AppCompatActivity() {
 
         logAll(A_TEXT)
         item.a = value
-        aInput.setText(value.toString())
+        acc_text.setText(value.toString())
     }
 
     private fun solveForT() {
@@ -396,11 +330,11 @@ class MainActivity : AppCompatActivity() {
 
         logAll(T_TEXT)
         item.t = value
-        tInput.setText(value.toString())
+        time_text.setText(value.toString())
     }
 
     private fun setVF() {
-        val input = vFInput.text.toString()
+        val input = vfinal_text.text.toString()
 
         item.vF = try {
             input.toDouble()
@@ -410,7 +344,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setVI() {
-        val input = vIInput.text.toString()
+        val input = vinitial_text.text.toString()
 
         item.vI = try {
             input.toDouble()
@@ -420,7 +354,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setDX() {
-        val input = dXInput.text.toString()
+        val input = deltax_text.text.toString()
 
         item.dX = try {
             input.toDouble()
@@ -430,7 +364,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setA() {
-        val input = aInput.text.toString()
+        val input = acc_text.text.toString()
 
         item.a = try {
             input.toDouble()
@@ -440,7 +374,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setT() {
-        val input = tInput.text.toString()
+        val input = time_text.text.toString()
 
         item.t = try {
             input.toDouble()
@@ -450,11 +384,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun logAll(source: String) {
-        Log.e("Source", source)
-        Log.e("VFVal", item.vF.toString())
-        Log.e("VIVal", item.vI.toString())
-        Log.e("DXVal", item.dX.toString())
-        Log.e("AVal", item.a.toString())
-        Log.e("TVal", item.t.toString())
+        if (BuildConfig.DEBUG) {
+            Log.e("Source", source)
+            Log.e("VFVal", item.vF.toString())
+            Log.e("VIVal", item.vI.toString())
+            Log.e("DXVal", item.dX.toString())
+            Log.e("AVal", item.a.toString())
+            Log.e("TVal", item.t.toString())
+        }
     }
 }
