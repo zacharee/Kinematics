@@ -7,8 +7,7 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:stretchColumns="0,1,2">
+        android:layout_height="match_parent">
 
         <TableRow
             android:id="@+id/time_row"
@@ -16,13 +15,13 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="5dp">
 
-            <TextView
+            <com.zacharee1.kinematics.views.HtmlTextView
                 android:id="@+id/time_title"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical|end"
-                android:text="Time ="
+                android:text="@string/time"
                 android:textAlignment="textEnd"
                 android:textSize="18sp"
                 />
@@ -36,22 +35,12 @@
                 android:layout_marginStart="@dimen/detail_margin_side"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
+                android:background="?android:attr/selectableItemBackground"
                 android:gravity="center_vertical"
                 android:textAlignment="center"
                 android:textSize="18sp"
                 />
 
-            <TextView
-                android:id="@+id/time_unit"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:gravity="center_vertical|start"
-                android:text="s"
-                android:textAlignment="textStart"
-                android:textSize="18sp"
-                />
         </TableRow>
 
         <TableRow
@@ -60,13 +49,13 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="5dp">
 
-            <TextView
+            <com.zacharee1.kinematics.views.HtmlTextView
                 android:id="@+id/acc_title"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical|end"
-                android:text="Acc ="
+                android:text="@string/acceleration"
                 android:textAlignment="textEnd"
                 android:textSize="18sp"
                 />
@@ -86,17 +75,6 @@
                 android:textSize="18sp"
                 />
 
-            <TextView
-                android:id="@+id/acc_unit"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:gravity="center_vertical|start"
-                android:text="m/s²"
-                android:textAlignment="textStart"
-                android:textSize="18sp"
-                />
-
         </TableRow>
 
         <TableRow
@@ -105,13 +83,13 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="5dp">
 
-            <TextView
+            <com.zacharee1.kinematics.views.HtmlTextView
                 android:id="@+id/vi_title"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical|end"
-                android:text="VIinital ="
+                android:text="@string/v_initial"
                 android:textAlignment="textEnd"
                 android:textSize="18sp"
                 />
@@ -130,16 +108,6 @@
                 android:textAlignment="center"
                 android:textSize="18sp" />
 
-            <TextView
-                android:id="@+id/vi_unit"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:gravity="center_vertical|start"
-                android:text="m/s"
-                android:textAlignment="textStart"
-                android:textSize="18sp" />
-
         </TableRow>
 
         <TableRow
@@ -148,13 +116,13 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="5dp">
 
-            <TextView
+            <com.zacharee1.kinematics.views.HtmlTextView
                 android:id="@+id/vf_title"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical|end"
-                android:text="VFinal ="
+                android:text="@string/v_final"
                 android:textAlignment="textEnd"
                 android:textSize="18sp" />
 
@@ -172,16 +140,6 @@
                 android:textAlignment="center"
                 android:textSize="18sp" />
 
-            <TextView
-                android:id="@+id/vf_unit"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:gravity="center_vertical|start"
-                android:text="m/s"
-                android:textAlignment="textStart"
-                android:textSize="18sp" />
-
         </TableRow>
 
         <TableRow
@@ -189,13 +147,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
+            <com.zacharee1.kinematics.views.HtmlTextView
                 android:id="@+id/dx_title"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical|end"
-                android:text="Δx ="
+                android:text="@string/delta_x"
                 android:textAlignment="textEnd"
                 android:textSize="18sp" />
 
@@ -208,21 +166,13 @@
                 android:layout_marginStart="@dimen/detail_margin_side"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
+                android:background="?android:attr/selectableItemBackground"
                 android:gravity="center_vertical"
                 android:textAlignment="center"
                 android:textSize="18sp" />
 
-            <TextView
-                android:id="@+id/dx_unit"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:gravity="center_vertical|start"
-                android:text="m"
-                android:textAlignment="textStart"
-                android:textSize="18sp" />
-
         </TableRow>
+
     </TableLayout>
+
 </LinearLayout>

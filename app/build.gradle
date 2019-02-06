@@ -9,7 +9,7 @@ android {
     buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.zacharee1.kinematics"
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -38,4 +38,5 @@ dependencies {
 
     //Other
     implementation 'jp.wasabeef:recyclerview-animators:3.0.0'
+    implementation "ru.noties:markwon:2.0.1"
 }

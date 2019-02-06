@@ -57,35 +57,35 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
 
-                        <com.google.android.material.textfield.TextInputLayout
+                        <com.zacharee1.kinematics.views.HtmlTextInputLayout
                             android:id="@+id/t"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            app:helperText="@string/time">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/time_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Time (s)"
                                 android:inputType="numberSigned|numberDecimal"
                                 />
 
-                        </com.google.android.material.textfield.TextInputLayout>
+                        </com.zacharee1.kinematics.views.HtmlTextInputLayout>
 
-                        <com.google.android.material.textfield.TextInputLayout
+                        <com.zacharee1.kinematics.views.HtmlTextInputLayout
                             android:id="@+id/acc"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            app:helperText="@string/acceleration">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/acc_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="A (m/s²)"
                                 android:inputType="numberSigned|numberDecimal"
                                 />
 
-                        </com.google.android.material.textfield.TextInputLayout>
+                        </com.zacharee1.kinematics.views.HtmlTextInputLayout>
 
                     </TableRow>
 
@@ -93,35 +93,35 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
 
-                        <com.google.android.material.textfield.TextInputLayout
+                        <com.zacharee1.kinematics.views.HtmlTextInputLayout
                             android:id="@+id/vi"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            app:helperText="@string/v_initial">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/vinitial_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="VI (m/s)"
                                 android:inputType="numberSigned|numberDecimal"
                                 />
 
-                        </com.google.android.material.textfield.TextInputLayout>
+                        </com.zacharee1.kinematics.views.HtmlTextInputLayout>
 
-                        <com.google.android.material.textfield.TextInputLayout
+                        <com.zacharee1.kinematics.views.HtmlTextInputLayout
                             android:id="@+id/vf"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            app:helperText="@string/v_final">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/vfinal_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="VF (m/s)"
                                 android:inputType="numberSigned|numberDecimal"
                                 />
 
-                        </com.google.android.material.textfield.TextInputLayout>
+                        </com.zacharee1.kinematics.views.HtmlTextInputLayout>
 
                     </TableRow>
 
@@ -130,20 +130,20 @@
                         android:layout_height="match_parent"
                         android:gravity="center_horizontal">
 
-                        <com.google.android.material.textfield.TextInputLayout
+                        <com.zacharee1.kinematics.views.HtmlTextInputLayout
                             android:id="@+id/dx"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            app:helperText="@string/delta_x">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/deltax_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Δx (m)"
                                 android:inputType="numberSigned|numberDecimal"
                                 />
 
-                        </com.google.android.material.textfield.TextInputLayout>
+                        </com.zacharee1.kinematics.views.HtmlTextInputLayout>
 
                     </TableRow>
 
