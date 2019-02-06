@@ -50,7 +50,7 @@ class HistoryActivity : AppCompatActivity() {
             val itemView = viewHolder.itemView
             val height = itemView.bottom - itemView.top
             val icon = ContextCompat.getDrawable(this@HistoryActivity, R.drawable.ic_delete_black_24dp)!!
-                    .apply { setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN) }
+                    .apply { setColorFilter(ContextCompat.getColor(this@HistoryActivity, R.color.delete_icon), PorterDuff.Mode.SRC_IN) }
 
             val canceled = dX == 0f && !isCurrentlyActive
 
@@ -63,7 +63,7 @@ class HistoryActivity : AppCompatActivity() {
             }
 
             val background = ColorDrawable()
-            background.color = ContextCompat.getColor(this@HistoryActivity, R.color.delete)
+            background.color = ContextCompat.getColor(this@HistoryActivity, R.color.delete_background)
             background.bounds = Rect(itemView.left, itemView.top, itemView.right, itemView.bottom)
             background.draw(c)
 
