@@ -1,16 +1,20 @@
 package com.zacharee1.kinematics
 
 import android.content.*
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.design.widget.TextInputEditText
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import java.text.SimpleDateFormat
@@ -70,7 +74,7 @@ class MainActivity : AppCompatActivity() {
         tInput.text = null
 
         val manager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        manager.hideSoftInputFromWindow(window.currentFocus.windowToken, 0)
+        manager.hideSoftInputFromWindow(window?.currentFocus?.windowToken, 0)
 
         vFInput.clearFocus()
         vIInput.clearFocus()

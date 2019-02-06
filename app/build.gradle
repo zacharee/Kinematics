@@ -37,5 +37,5 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
 
     //Other
-    implementation 'jp.wasabeef:recyclerview-animators:2.2.7'
+    implementation 'jp.wasabeef:recyclerview-animators:3.0.0'
 }

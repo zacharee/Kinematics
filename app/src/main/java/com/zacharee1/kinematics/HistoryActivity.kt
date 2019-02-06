@@ -4,13 +4,8 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.SharedPreferences
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +15,11 @@ import android.view.animation.OvershootInterpolator
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import jp.wasabeef.recyclerview.animators.FadeInAnimator
@@ -68,8 +68,9 @@ class HistoryActivity : AppCompatActivity() {
 
         private var lastPosition = -1
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): CustomHolder {
-            val view: View = LayoutInflater.from(parent?.context).inflate(R.layout.history_layout, parent, false)
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomHolder {
+            val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.history_layout, parent, false)
             return CustomHolder(view)
         }
 
@@ -87,12 +88,12 @@ class HistoryActivity : AppCompatActivity() {
                 AlertDialog.Builder(holder.itemView.context)
                         .setTitle("Delete?")
                         .setMessage("Remove From History?")
-                        .setPositiveButton("Yes", { _, _ ->
+                        .setPositiveButton("Yes") { _, _ ->
                             val newIndex = historyList.indexOf(history)
                             historyList.remove(history)
                             saveNewHistory(historyList)
                             notifyItemRemoved(newIndex)
-                        })
+                        }
                         .setNegativeButton("No", null)
                         .show()
                 true
@@ -163,31 +164,21 @@ class HistoryActivity : AppCompatActivity() {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
             val gson = GsonBuilder()
-            var json = gson.serializeSpecialFloatingPointValues().create().toJson(list)
+            val json = gson.serializeSpecialFloatingPointValues().create().toJson(list)
 
             sharedPreferences.edit().putString("history_json", json).apply()
         }
 
         class CustomHolder constructor(v: View) : RecyclerView.ViewHolder(v) {
-            var date: TextView
-            var time: TextView
-            var acc: TextView
-            var vi: TextView
-            var vf: TextView
-            var dx: TextView
+            val date: TextView = v.findViewById(R.id.date_text)
+            val time: TextView = v.findViewById(R.id.time_history)
+            val acc: TextView = v.findViewById(R.id.acc_history)
+            val vi: TextView = v.findViewById(R.id.vinitial_history)
+            val vf: TextView = v.findViewById(R.id.vfinal_history)
+            val dx: TextView = v.findViewById(R.id.dx_history)
 
-            var layout: LinearLayout
+            val layout: LinearLayout = v.findViewById(R.id.history_layout)
 
-            init {
-                date = v.findViewById(R.id.date_text)
-                time = v.findViewById(R.id.time_history)
-                acc = v.findViewById(R.id.acc_history)
-                vi = v.findViewById(R.id.vinitial_history)
-                vf = v.findViewById(R.id.vfinal_history)
-                dx = v.findViewById(R.id.dx_history)
-
-                layout = v.findViewById(R.id.history_layout)
-            }
         }
     }
 }
