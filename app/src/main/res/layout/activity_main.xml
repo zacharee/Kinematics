@@ -46,7 +46,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="@dimen/calc_layout_padding">
 
                 <TableLayout
                     android:layout_width="match_parent"
@@ -159,9 +159,11 @@
         android:id="@+id/result"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginBottom="@dimen/result_margin_bottom"
+        android:layout_marginEnd="@dimen/result_margin_end"
+        android:layout_marginStart="@dimen/result_margin_start"
+        android:layout_marginRight="@dimen/result_margin_end"
+        android:layout_marginLeft="@dimen/result_margin_start"
         android:background="@drawable/border"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"

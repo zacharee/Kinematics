@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="history_item_padding">5dp</dimen>
+    <dimen name="calc_layout_padding">16dp</dimen>
+
+    <dimen name="result_margin_bottom">16dp</dimen>
+    <dimen name="result_margin_end">8dp</dimen>
+    <dimen name="result_margin_start">8dp</dimen>
 
     <dimen name="history_date_margin_bottom">16dp</dimen>
 
