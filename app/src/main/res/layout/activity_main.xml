@@ -22,7 +22,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:titleTextColor="@android:color/white"
-            android:background="?attr/colorPrimary" />
+            android:background="?attr/colorPrimary"
+            />
 
     </androidx.appcompat.widget.ActionBarContainer>
 
@@ -66,7 +67,9 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="Time (s)"
-                                android:inputType="numberSigned|numberDecimal" />
+                                android:inputType="numberSigned|numberDecimal"
+                                />
+
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -79,8 +82,11 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="A (m/s²)"
-                                android:inputType="numberSigned|numberDecimal" />
+                                android:inputType="numberSigned|numberDecimal"
+                                />
+
                         </com.google.android.material.textfield.TextInputLayout>
+
                     </TableRow>
 
                     <TableRow
@@ -97,7 +103,9 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="VI (m/s)"
-                                android:inputType="numberSigned|numberDecimal" />
+                                android:inputType="numberSigned|numberDecimal"
+                                />
+
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -110,8 +118,11 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="VF (m/s)"
-                                android:inputType="numberSigned|numberDecimal" />
+                                android:inputType="numberSigned|numberDecimal"
+                                />
+
                         </com.google.android.material.textfield.TextInputLayout>
+
                     </TableRow>
 
                     <TableRow
@@ -129,8 +140,11 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="Δx (m)"
-                                android:inputType="numberSigned|numberDecimal" />
+                                android:inputType="numberSigned|numberDecimal"
+                                />
+
                         </com.google.android.material.textfield.TextInputLayout>
+
                     </TableRow>
 
                 </TableLayout>
@@ -160,7 +174,8 @@
             layout="@layout/history_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            />
 
     </LinearLayout>
 
