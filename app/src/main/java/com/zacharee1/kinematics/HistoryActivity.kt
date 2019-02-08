@@ -5,6 +5,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
@@ -15,11 +16,15 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import jp.wasabeef.recyclerview.animators.FadeInAnimator
+import com.zacharee1.kinematics.utils.sharedPreferences
+import jp.wasabeef.recyclerview.animators.ScaleInTopAnimator
 import kotlinx.android.synthetic.main.activity_history.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -27,13 +32,14 @@ import kotlin.collections.ArrayList
 class HistoryActivity : AppCompatActivity() {
     private val sharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
     private val adapter by lazy {
-        val gson = GsonBuilder()
-        val json = sharedPreferences.getString("history_json", null)
-        val type = object: TypeToken<ArrayList<HistoryItem>>(){}.type
+        CustomAdapter(history_list) {
+            val lm = history_list.layoutManager as LinearLayoutManager
 
-        CustomAdapter(gson
-                .serializeSpecialFloatingPointValues()
-                .create().fromJson(json, type) ?: ArrayList(), history_list)
+            if (it == 0
+                    || it < lm.findFirstVisibleItemPosition()
+                    || it > lm.findLastVisibleItemPosition())
+                history_list.scrollToPosition(it)
+        }
     }
 
     private val touchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
@@ -85,9 +91,14 @@ class HistoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
 
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
+        }
+
         history_list.setHasFixedSize(true)
 
-        val llm = LinearLayoutManager(this)
+        val llm = LinearLayoutManager(this@HistoryActivity)
         llm.orientation = LinearLayoutManager.VERTICAL
 
         history_list.layoutManager = llm
@@ -95,15 +106,49 @@ class HistoryActivity : AppCompatActivity() {
 
         touchHelper.attachToRecyclerView(history_list)
 
-        val decorator = DividerItemDecoration(this, llm.orientation)
+        val decorator = DividerItemDecoration(this@HistoryActivity, llm.orientation)
 
         history_list.addItemDecoration(decorator)
-        history_list.itemAnimator = FadeInAnimator(OvershootInterpolator())
+
+        history_list.itemAnimator = ScaleInTopAnimator().apply {
+            setInterpolator(OvershootInterpolator())
+            addDuration = resources.getInteger(R.integer.recview_anim_duration_ms).toLong()
+        }
     }
 
-    class CustomAdapter constructor(
-            private val historyList: ArrayList<HistoryItem>,
-            private val snackView: View) : RecyclerView.Adapter<CustomAdapter.CustomHolder>() {
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onEnterAnimationComplete() {
+        generate()
+    }
+
+    private fun generate() {
+        GlobalScope.async {
+            val json = sharedPreferences.getString("history_json", null)
+            val type = object : TypeToken<ArrayList<HistoryItem>>() {}.type
+
+            val items = GsonBuilder()
+                    .serializeSpecialFloatingPointValues()
+                    .create().fromJson<ArrayList<HistoryItem>>(json, type) ?: ArrayList()
+
+            runOnUiThread {
+                adapter.addItems(items)
+            }
+        }
+    }
+
+    class CustomAdapter constructor(private val snackView: View, private val undoListener: ((Int) -> Unit))
+        : RecyclerView.Adapter<CustomAdapter.CustomHolder>() {
+        private val historyList: ArrayList<HistoryItem> = ArrayList()
+        private val dateFormat = SimpleDateFormat("E MM/dd/yy hh:mm:ss a", Locale.getDefault())
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomHolder {
             val view = LayoutInflater.from(parent.context)
@@ -114,7 +159,7 @@ class HistoryActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: CustomHolder, position: Int) {
             val history = historyList[position]
 
-            holder.date.text = SimpleDateFormat("E MM/dd/yy hh:mm:ss a", Locale.getDefault()).format(history.time)
+            holder.date.text = dateFormat.format(history.time)
             holder.time.text = "${history.t}"
             holder.acc.text = "${history.a}"
             holder.vi.text = "${history.vI}"
@@ -126,6 +171,19 @@ class HistoryActivity : AppCompatActivity() {
             return historyList.size
         }
 
+        fun addItem(item: HistoryItem) {
+            historyList.add(item)
+            notifyItemInserted(historyList.lastIndex)
+        }
+
+        fun addItems(items: List<HistoryItem>) {
+            val prevLast = historyList.lastIndex
+
+            historyList.addAll(items)
+
+            notifyItemRangeInserted(prevLast + 1, historyList.lastIndex)
+        }
+
         fun removeItem(position: Int) {
             val item = historyList.removeAt(position)
             notifyItemRemoved(position)
@@ -134,10 +192,30 @@ class HistoryActivity : AppCompatActivity() {
                     .apply {
                         setAction(R.string.undo) {
                             historyList.add(position, item)
+
+                            val toPos = when {
+                                position > historyList.lastIndex -> historyList.lastIndex
+                                else -> position
+                            }
+
                             notifyItemInserted(position)
+                            undoListener.invoke(toPos)
                         }
+                        addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                                saveHistory()
+                            }
+                        })
+
                         show()
                     }
+        }
+
+        private fun saveHistory() {
+            val gBuilder = GsonBuilder()
+            val json = gBuilder.serializeSpecialFloatingPointValues().create().toJson(historyList)
+
+            snackView.context.sharedPreferences.edit().putString("history_json", json).apply()
         }
 
         class CustomHolder constructor(v: View) : RecyclerView.ViewHolder(v) {
